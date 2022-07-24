@@ -287,6 +287,7 @@ class REWindow(QWidget):
                         "attachmentsname"	TEXT,
                         "attachmentsurl"	TEXT,
                         "referer"           varchar(120),
+                        "author" TEXT,
                         PRIMARY KEY("id" AUTOINCREMENT));
                         """
                 print(DBtext)
@@ -418,15 +419,17 @@ class DiscordRun:
         WebTemp = json.loads(Doc.text)
         self.LogLen=len(WebTemp)#資料筆數
         while count<self.LogLen: #A:timestamp B:content C:title D:url E:attachmentsname F:attachmentsurl G:referer
-            DataTitle,DataUrl,DataAttname,DataAtturl='','','',''
+            DataTitle,DataUrl,DataAttname,DataAtturl, DataAuthor='','','','', ''
             countURL=0
             try:
                 DataTitleontent=WebTemp[count]['content']
                 DataTime=WebTemp[count]['timestamp']
                 DataReferer=self.url+'/'+WebTemp[count]['id']
+                DataAuthor = WebTemp[count]["author"]["id"]
                 DataValue['content']=DataTitleontent
                 DataValue['timestamp']=DataTime
                 DataValue['referer']=DataReferer
+                DataValue['Author'] = DataAuthor
                 
                 countURLMax=len(WebTemp[count]['embeds'])
                 for countURL in range(countURLMax):
@@ -504,9 +507,9 @@ class DiscordRun:
                     data_1=eval(data_1)    
                 if data_2 == "=":
                     if re.findall(re.compile(data_1, re.I), readData)!=[]:
-                        command = "INSERT INTO '"+data_3+"'(timestamp, content, title, url, attachmentsname, attachmentsurl, referer)VALUES(?,?,?,?,?,?,?)"
+                        command = "INSERT INTO '"+data_3+"'(timestamp, content, title, url, attachmentsname, attachmentsurl, referer, author)VALUES(?,?,?,?,?,?,?,?)"
                         try:
-                            cursor.execute(command, (Temp["timestamp"], Temp["content"], Temp["title"], Temp["url"], Temp["attachmentsname"], Temp["attachmentsurl"], Temp["referer"]))
+                            cursor.execute(command, (Temp["timestamp"], Temp["content"], Temp["title"], Temp["url"], Temp["attachmentsname"], Temp["attachmentsurl"], Temp["referer"], Temp["Author"]))
                         except Exception as err:
                             if re.compile(r'UNIQUE constraint failed:.+').findall(str(err)) ==[]:
                                 window.PrintErr(err)
@@ -514,9 +517,9 @@ class DiscordRun:
                         break
                 else:#≠
                     if re.findall(re.compile(data_1, re.I), readData)==[]:
-                        command = "INSERT INTO '"+data_3+"'(timestamp, content, title, url, attachmentsname, attachmentsurl, referer)VALUES(?,?,?,?,?,?,?)"
+                        command = "INSERT INTO '"+data_3+"'(timestamp, content, title, url, attachmentsname, attachmentsurl, referer, author)VALUES(?,?,?,?,?,?,?,?)"
                         try:
-                            cursor.execute(command, (Temp["timestamp"], Temp["content"], Temp["title"], Temp["url"], Temp["attachmentsname"], Temp["attachmentsurl"], Temp["referer"]))
+                            cursor.execute(command, (Temp["timestamp"], Temp["content"], Temp["title"], Temp["url"], Temp["attachmentsname"], Temp["attachmentsurl"], Temp["referer"], Temp["Author"]))
                         except Exception as err:
                             if re.compile(r'UNIQUE constraint failed:.+').findall(str(err)) ==[]:
                                 window.PrintErr(err)
@@ -538,6 +541,7 @@ class DiscordRun:
                         "attachmentsname"	TEXT,
                         "attachmentsurl"	TEXT,
                         "referer"	varchar(120),
+                        "author" TEXT,
                     	PRIMARY KEY("id" AUTOINCREMENT));
                          """)
             conn.execute("""
@@ -550,6 +554,7 @@ class DiscordRun:
                         "attachmentsname"	TEXT,
                         "attachmentsurl"	TEXT,
                         "referer"	varchar(120),
+                        "author" TEXT,
                     	PRIMARY KEY("id" AUTOINCREMENT));
                          """)
             conn.close()
